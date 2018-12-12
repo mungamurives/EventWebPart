@@ -41,6 +41,7 @@ export default class GetEvents extends React.Component<IGetEventsProps, IGetEven
     }).get().then(el => el);
 
     let tempGetCalendarItems: IEventsListItems[] = [...this.state.calendarItems];
+    debugger;
 
     if (calendar && calendar.length > 0) {
       calendar.forEach((element: IEventsListItems) => {
