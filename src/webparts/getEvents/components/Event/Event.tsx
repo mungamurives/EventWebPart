@@ -9,25 +9,39 @@ export interface IEvents {
     Location: string;
     Category: string;
     fAllDayEvent: boolean;
+    monthArray: string[];
+    key: any;
+    documentCardClicked: () => void;
 }
 const events = (props: IEvents) => {
-    const startDate = new Date(props.EventDate).toUTCString();
-    const endDate = new Date(props.EventDate).toUTCString();//Wed, 05 Dec 2018 00:00:00 GMT
-    const startMonth = startDate.split(" ")[2];
-    const startDay = startDate.split(" ")[1];
+    const tempStartDate = new Date(props.EventDate);
+    const tempEndDate = new Date(props.EndDate);//Wed, 05 Dec 2018 00:00:00 GMT
+    let dateIsDiff: boolean = false;
+    if (new Date(Date.UTC(tempStartDate.getFullYear(), tempStartDate.getMonth(), tempStartDate.getDate(), 0, 0, 0, 0)).toUTCString() !== new Date(Date.UTC(tempEndDate.getFullYear(), tempEndDate.getMonth(), tempEndDate.getDate(), 0, 0, 0, 0)).toUTCString()) {
+        dateIsDiff = true;
+    }
 
-    const endMonth = endDate.split(" ")[2];
-    const endDay = endDate.split(" ")[1];
-    const dayDif: number = parseInt(endDay, 10) - parseInt(startDay, 10);
+    const startDay = tempStartDate.toString().split(" ")[1];
+
     return (
-        <DocumentCard className={styles.Events}>
+        <DocumentCard className={styles.Events} onClick={props.documentCardClicked}>
             <div className={styles.MainCard}>
                 <div className={styles.DateBoxContainer}>
-                    <div className={styles.SingleDayBox}>
-                        <div className={styles.SingleMonth}>{startMonth}</div>
-                        <div className={styles.SingleDay}>{startDay}</div>
+                    {
 
-                    </div>
+                        !dateIsDiff ?
+
+                            <div className={styles.SingleDayBox}>
+                                <div className={styles.SingleMonth}>{props.monthArray[tempStartDate.getUTCMonth()]}</div>
+                                <div className={styles.SingleDay}>{tempStartDate.getUTCDate()}</div>
+                            </div>
+                            :
+                            <div className={styles.MultipleDayBox}>
+                                <div className={styles.MultipleMonthDay}>{props.monthArray[tempStartDate.getUTCMonth()]} {tempStartDate.getUTCDate()}</div>
+                                <hr className={styles.Seperator} />
+                                <div className={styles.MultipleMonthDay}>{props.monthArray[tempEndDate.getUTCMonth()]} {tempEndDate.getUTCDate()}</div>
+                            </div>
+                    }
                 </div>
 
                 <div className={styles.SectionDetails}>
@@ -40,7 +54,7 @@ const events = (props: IEvents) => {
                     </div>
                     <div>
                         <div className={styles.CategoryDateLocation}>
-                            <div className={styles.Date}>{startDate}</div>
+                            <div className={styles.Date}></div>
                         </div>
                         <div className={styles.CategoryDateLocation}>
                             <div className={styles.CategoryLocation}>{props.Location}</div>

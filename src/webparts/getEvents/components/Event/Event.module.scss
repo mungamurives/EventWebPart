@@ -82,6 +82,7 @@
                 height: 80px;
                 width: 80px;
                 font-weight: 400;
+                font-size: 12px;
                 border: 1px solid;
                 color: #333333;
                 display: flex;
@@ -91,8 +92,7 @@
         }
             
             .MultipleMonthDay {
-                font-size: 12px;
-                font-weight: 400;
+                
                 display: flex;
                 flex-grow: 1;
                 flex-direction: column;
