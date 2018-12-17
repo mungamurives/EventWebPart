@@ -2,8 +2,9 @@ import * as React from 'react';
 import styling from './Event.module.scss';
 import { DocumentCard } from 'office-ui-fabric-react/lib/DocumentCard';
 import { Callout, DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
-import { DefaultButton } from 'office-ui-fabric-react/lib/Button';
-import { getTheme, FontWeights, mergeStyleSets } from 'office-ui-fabric-react/lib/Styling';
+import { DefaultButton, IButtonStyles } from 'office-ui-fabric-react/lib/Button';
+import { getTheme, FontWeights, mergeStyleSets, ColorClassNames } from 'office-ui-fabric-react/lib/Styling';
+import { ActionButton, IButtonProps } from 'office-ui-fabric-react/lib/Button';
 
 export interface IEventsProps {
     Title: string;
@@ -20,6 +21,7 @@ export interface IEventState {
     isCallOutVisible: boolean;
 }
 
+
 const theme = getTheme();
 const styles = mergeStyleSets({
     buttonArea: {
@@ -28,23 +30,70 @@ const styles = mergeStyleSets({
         textAlign: 'center'
     },
     callout: {
-        maxWidth: 300
+        minWidth: 250
     },
-    header: {
-        padding: '18px 24px 12px'
+    container: {
+        height: 220,
+        width: 250,
+        margin: '5px'
     },
-    title: [
-        theme.fonts.xLarge,
+    title: {
+        height: '35%',
+        width: '100%',
+        display: 'flex'
+    },
+    dateBox: {
+        margin: '5px 5px',
+        height: '70px',
+        width: '70px',
+        border: '1px solid #ccc',
+        display: 'flex',
+        flexDirection: 'column',
+        textAlign: 'center'
+    },
+    dateBoxMonth: [
+        theme.fonts.large,
         {
-            margin: 0,
-            color: theme.palette.neutralPrimary,
-            fontWeight: FontWeights.semilight
+            backgroundColor: theme.palette.themePrimary,
+            color: theme.palette.themeLighterAlt,
+            height: '50%',
+            width: '100%',
+            fontWeight: 600,
+            boxSizing: "border-box",
+            lineHeight: 33,
+            textTransform: "uppercase"
         }
     ],
-    inner: {
-        height: '100%',
-        padding: '0 24px 20px'
+    dateBoxDate: [
+        theme.fonts.large,
+        {
+            height: '50%',
+            width: '100%',
+            fontWeight: '600',
+            lineHeight: '33px',
+            boxSizing: "border-box",
+        }
+    ],
+    eventTitle: {
+        height: '94%',
+        width: '66%',
+        margin: '5px 0px 0px 0px',
+        display: "flex",
+        flexDirection: 'column',
+        boxSizing: 'border-box'
     },
+    eventInnerTitle: [
+        theme.fonts.large,
+        {
+            height: "50%",
+            width: "100%",
+            lineHeight: "33px",
+            textOverflow: 'ellipsis',
+            overflow: 'hidden',
+            paddingLeft : 6,
+            whiteSpace : 'nowrap'
+        }
+    ],
     actions: {
         position: 'relative',
         marginTop: 20,
@@ -149,14 +198,28 @@ export default class Events extends React.Component<IEventsProps, IEventState>{
                     target={this._menuButtonElement.current}
                     onDismiss={this._onCalloutDismiss}
                     setInitialFocus={true}
-                    directionalHint={DirectionalHint.rightCenter}
                     hidden={!this.state.isCallOutVisible}
-                    className="ms-CalloutExample-callout"
+                    directionalHint={DirectionalHint.rightCenter}
+                    className={styling.CallOut}
                 >
-                    <div className={styling.HoverCardContainer}>
-                        <div className={styling.HoverTitleContainer}>
-                            <div>Date Here</div>
-                            <div>{Title}</div>
+                    <div className={styles.container}>
+                        <div className={styles.title}>
+                            <div className={styles.dateBox}>
+                                <div className={styles.dateBoxMonth}>{this.props.monthArray[tempStartDate.getMonth()]}</div>
+                                <div className={styles.dateBoxDate}>{tempStartDate.getDate()}</div>
+                            </div>
+                            <div className={styles.eventTitle}>
+                                <div className={styles.eventInnerTitle}>{Title}</div>
+                                <div>
+                                    <ActionButton 
+                                        iconProps={{
+                                            iconName : 'AddEvent'
+                                        }}
+                                    >
+                                    Add to Outlook
+                                    </ActionButton>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </Callout>

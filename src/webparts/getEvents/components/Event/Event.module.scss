@@ -108,15 +108,20 @@
         }
     }
 
-    .HoverCardContainer{
-        height: 220px;
-        width: 280px;
+    .CallOut{
+        max-width: 300px;
+        max-height: 250px;
 
-        .HoverTitleContainer{
-            height: 30%;
-            width: 100%;
+        .HoverCardContainer{
+            height: 220px;
+            width: 280px;
 
-            
-        }        
+            .HoverTitleContainer{
+                height: 30%;
+                width: 100%;
+
+                
+            }        
+        }
     }
 }
