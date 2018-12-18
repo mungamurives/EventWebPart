@@ -4,13 +4,9 @@ import { IGetEventsProps } from './IGetEventsProps';
 import { escape } from '@microsoft/sp-lodash-subset';
 import pnp, { Item } from 'sp-pnp-js';
 import { IEventsListItems } from './IEventsListItems';
-import { IGetEventsWebPartProps } from '../IGetEventsWebPartProps';
 import { WebPartTitle } from '@pnp/spfx-controls-react/lib/WebPartTitle';
-import { Placeholder } from '@pnp/spfx-controls-react/lib/Placeholder';
 import Event from '../components/Event/Event';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
-import { Callout, DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
-import { Link } from 'office-ui-fabric-react/lib/Link';
 
 export interface IGetEventsState {
   calendarItems: IEventsListItems[];
@@ -20,8 +16,6 @@ export interface IGetEventsState {
 
 export default class GetEvents extends React.Component<IGetEventsProps, IGetEventsState> {
   private monthArray = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  private eventsUrl: string = this.props.currentUrl + '/_layouts/15/Events.aspx?ListGuid=' + this.props.listGUID;
-  private eventUrl: string = this.props.currentUrl + '/_layouts/15/Event.aspx?ListGuid=' + this.props.listGUID;
   /**
    * Default Constructor
    */
@@ -97,7 +91,7 @@ export default class GetEvents extends React.Component<IGetEventsProps, IGetEven
               monthArray={this.monthArray}
               key={id}
               ID={el.ID}
-              eventUrl={this.eventUrl}
+              eventUrl={"#"}
               Description={el.Description}
             />
           )
@@ -110,7 +104,7 @@ export default class GetEvents extends React.Component<IGetEventsProps, IGetEven
       <div>
         {showSpinner}
         {showEvents}
-        <Link href={this.eventsUrl}>See all</Link>
+        {/* <Link href={"#"}>See all</Link> */}
       </div>
     );
   }

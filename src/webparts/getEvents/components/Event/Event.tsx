@@ -2,10 +2,9 @@ import * as React from 'react';
 import styling from './Event.module.scss';
 import { DocumentCard } from 'office-ui-fabric-react/lib/DocumentCard';
 import { Callout, DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
-import { DefaultButton } from 'office-ui-fabric-react/lib/Button';
-import { getTheme, FontWeights, mergeStyleSets } from 'office-ui-fabric-react/lib/Styling';
+import { DefaultButton, IButtonStyles } from 'office-ui-fabric-react/lib/Button';
+import { getTheme, FontWeights, mergeStyleSets, ColorClassNames } from 'office-ui-fabric-react/lib/Styling';
 import { ActionButton, IButtonProps } from 'office-ui-fabric-react/lib/Button';
-import { Link } from 'office-ui-fabric-react/lib/Link';
 
 export interface IEventsProps {
     Title: string;
@@ -94,8 +93,8 @@ const styles = mergeStyleSets({
             lineHeight: "33px",
             textOverflow: 'ellipsis',
             overflow: 'hidden',
-            paddingLeft: 6,
-            whiteSpace: 'nowrap'
+            paddingLeft : 6,
+            whiteSpace : 'nowrap'
         }
     ],
     actions: {
@@ -216,12 +215,12 @@ export default class Events extends React.Component<IEventsProps, IEventState>{
                             <div className={styles.eventTitle}>
                                 <div className={styles.eventInnerTitle}>{Title}</div>
                                 <div>
-                                    <ActionButton
+                                    <ActionButton 
                                         iconProps={{
-                                            iconName: 'AddEvent'
+                                            iconName : 'AddEvent'
                                         }}
                                     >
-                                        Add to Outlook
+                                    Add to Outlook
                                     </ActionButton>
                                 </div>
                             </div>
@@ -229,7 +228,7 @@ export default class Events extends React.Component<IEventsProps, IEventState>{
                         <div>{Description}</div>
                         <div>{Location}</div>
                         <div>{startDay}, {this.props.monthArray[tempStartDate.getUTCMonth()]} {tempStartDate.getDate()} {this.props.fAllDayEvent ? "All Day" : `${tempStartDate.getHours()}:${tempStartDate.getMinutes()}`}</div>
-                        <div><Link href={this.itemID}>Click for more details</Link></div>
+                        {/* <div><Link href={this.itemID}>Click for more details</Link></div> */}
                     </div>
                 </Callout>
             </div>
