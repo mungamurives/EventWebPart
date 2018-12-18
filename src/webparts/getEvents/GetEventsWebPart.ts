@@ -36,7 +36,8 @@ export default class GetEventsWebPart extends BaseClientSideWebPart<IGetEventsWe
         fUpdateProperty: (value: string) => {
           this.properties.title = value;
         },
-        fPropertyPaneOpen: this.context.propertyPane.open
+        fPropertyPaneOpen: this.context.propertyPane.open,
+        currentUrl:this.context.pageContext.web.absoluteUrl
       }
     );
     ReactDom.render(element, this.domElement);

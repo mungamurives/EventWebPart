@@ -7,4 +7,5 @@ export interface IEventsListItems {
   Category: string;
   fAllDayEvent: boolean;
   fRecurrence: boolean;
+  ID:number;
 }

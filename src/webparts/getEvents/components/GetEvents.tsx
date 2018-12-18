@@ -10,17 +10,18 @@ import { Placeholder } from '@pnp/spfx-controls-react/lib/Placeholder';
 import Event from '../components/Event/Event';
 import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import { Callout, DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
+import { Link } from 'office-ui-fabric-react/lib/Link';
 
 export interface IGetEventsState {
   calendarItems: IEventsListItems[];
   showSpinner: boolean;
   isCallOutVisible: boolean;
-  _menuToBeShown?: HTMLElement | null;
 }
 
 export default class GetEvents extends React.Component<IGetEventsProps, IGetEventsState> {
   private monthArray = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  private _menuButtonElement: HTMLElement[] | null = [];
+  private eventsUrl: string = this.props.currentUrl + '/_layouts/15/Events.aspx?ListGuid=' + this.props.listGUID;
+  private eventUrl: string = this.props.currentUrl + '/_layouts/15/Event.aspx?ListGuid=' + this.props.listGUID;
   /**
    * Default Constructor
    */
@@ -38,7 +39,16 @@ export default class GetEvents extends React.Component<IGetEventsProps, IGetEven
   }
 
   protected getListItems = async () => {
-    const calendar = await pnp.sp.web.lists.getById(this.props.listGUID).items.top(1).configure({
+    const tempTodayDate = new Date();
+    //logic for today
+    const todayDate = tempTodayDate.toISOString().substring(0, 10) + "T00:00:00Z";
+    const tempWeekLastDayTemp=tempTodayDate.getDate()-tempTodayDate.getDay()+6;
+    //logic for week day
+    const weekLastDay=new Date(tempTodayDate.setDate(tempWeekLastDayTemp)).toISOString().substring(0, 10) + "T00:00:00Z";
+    //logic for last day
+    const monthLastDay=new Date(tempTodayDate.getFullYear(), tempTodayDate.getMonth()+1, 0, 23, 59, 59).toISOString().substring(0, 10) + "T00:00:00Z";
+
+    const calendar = await pnp.sp.web.lists.getById(this.props.listGUID).items.filter(`EventDate ge dateTime'${todayDate}' and EventDate le dateTime'${monthLastDay}'`).configure({
       headers: {
         'Accept': 'application/json;odata=nometadata',
         'odata-version': ''
@@ -57,7 +67,8 @@ export default class GetEvents extends React.Component<IGetEventsProps, IGetEven
           Description: element.Description,
           Category: element.Category,
           fAllDayEvent: element.fAllDayEvent,
-          fRecurrence: element.fRecurrence
+          fRecurrence: element.fRecurrence,
+          ID: element.ID
         });
       });
     }
@@ -68,41 +79,27 @@ export default class GetEvents extends React.Component<IGetEventsProps, IGetEven
 
   }
 
-  protected _onCalloutDismiss = () => {
-    this.setState({
-      isCallOutVisible: false
-    });
-  }
-
-  protected documentCardClickedHandler = (id: any) => {
-    console.log(this._menuButtonElement);
-    this.setState({
-      _menuToBeShown : this._menuButtonElement[id],
-      isCallOutVisible: true
-    });
-  }
-
 
   public render(): React.ReactElement<IGetEventsProps> {
     const showSpinner: JSX.Element = this.state.showSpinner ? <Spinner size={SpinnerSize.large} label={"Loading Data, please wait..."} /> : null;
 
     const showEvents: JSX.Element = this.state.calendarItems && this.state.calendarItems.length > 0 && !this.state.showSpinner ?
-      <div className={styles.row}>
+      <div style={{ display: "flex", overflowX: "auto", overflowY: "hidden" }}>
         {
           this.state.calendarItems.map((el, id) =>
-            <div className="ms-CalloutExample-buttonArea" ref={menuButton => (this._menuButtonElement[id] = menuButton)}>
-              <Event
-                Title={el.Title}
-                EventDate={el.EventDate}
-                EndDate={el.EndDate}
-                Location={el.Location}
-                Category={el.Category}
-                fAllDayEvent={el.fAllDayEvent}
-                monthArray={this.monthArray}
-                key={id}
-                documentCardClicked={this.documentCardClickedHandler.bind(this, id)}
-              />
-            </div>
+            <Event
+              Title={el.Title}
+              EventDate={el.EventDate}
+              EndDate={el.EndDate}
+              Location={el.Location}
+              Category={el.Category}
+              fAllDayEvent={el.fAllDayEvent}
+              monthArray={this.monthArray}
+              key={id}
+              ID={el.ID}
+              eventUrl={this.eventUrl}
+              Description={el.Description}
+            />
           )
         }
       </div>
@@ -111,36 +108,9 @@ export default class GetEvents extends React.Component<IGetEventsProps, IGetEven
 
     return (
       <div>
-        {/* <WebPartTitle
-          displayMode={this.props.displayMode}
-          title={this.props.title}
-          updateProperty={this.props.fUpdateProperty}
-        /> */}
-        <div className={styles.getEvents}>
-          {showSpinner}
-          {showEvents}
-          {this.state.isCallOutVisible ? (
-            <Callout
-              gapSpace={0}
-              target={this.state._menuToBeShown}
-              isBeakVisible={true}
-              beakWidth={20}
-              onDismiss={this._onCalloutDismiss}
-              directionalHint={DirectionalHint.rightCenter}
-            >
-              <div>
-                <p>All of your favorite people</p>
-              </div>
-              <div>
-                <div>
-                  <p>
-                    Message body is optional.
-                     </p>
-                </div>
-              </div>
-            </Callout>
-          ) : null}
-        </div>
+        {showSpinner}
+        {showEvents}
+        <Link href={this.eventsUrl}>See all</Link>
       </div>
     );
   }
