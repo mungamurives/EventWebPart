@@ -8,6 +8,6 @@
     "isDomainIsolated": false
   },
   "paths": {
-    "zippedPackage": "solution/sp-fx-webparts.sppkg"
+    "zippedPackage": "solution/event-calendar-webpart.sppkg"
   }
 }

@@ -3,8 +3,14 @@
     height: 40px;
     display: flex;
     background-color: rgb(244, 244, 244);
+    margin-bottom: 5px;
 
     .LabelText{
-        margin-right: 10px;
+        margin: 0px 10px;
+        align-self: center;
+    }
+
+    .DropDownContainer{
+        align-self: center;
     }
 }

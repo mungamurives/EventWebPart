@@ -3,9 +3,10 @@ import styling from './Event.module.scss';
 import { DocumentCard } from 'office-ui-fabric-react/lib/DocumentCard';
 import { Callout, DirectionalHint } from 'office-ui-fabric-react/lib/Callout';
 import { DefaultButton, IButtonStyles } from 'office-ui-fabric-react/lib/Button';
-import { getTheme, FontWeights, mergeStyleSets, ColorClassNames } from 'office-ui-fabric-react/lib/Styling';
+import { getTheme, FontWeights, mergeStyleSets, ColorClassNames, noWrap } from 'office-ui-fabric-react/lib/Styling';
 import { ActionButton, IButtonProps } from 'office-ui-fabric-react/lib/Button';
-
+import ReactHtmlParser from 'react-html-parser';
+import { Link } from 'office-ui-fabric-react/lib/Link';
 export interface IEventsProps {
     Title: string;
     EventDate: string;
@@ -36,7 +37,7 @@ const styles = mergeStyleSets({
         minWidth: 250
     },
     container: {
-        height: 220,
+        height: 270,
         width: 250,
         margin: '5px'
     },
@@ -93,8 +94,8 @@ const styles = mergeStyleSets({
             lineHeight: "33px",
             textOverflow: 'ellipsis',
             overflow: 'hidden',
-            paddingLeft : 6,
-            whiteSpace : 'nowrap'
+            paddingLeft: 6,
+            whiteSpace: 'nowrap'
         }
     ],
     actions: {
@@ -108,12 +109,27 @@ const styles = mergeStyleSets({
         {
             color: theme.palette.neutralPrimary
         }
+    ],
+    body: [
+        theme.fonts.medium,
+        {
+            minHeight: "48%",
+            margin: "2px 0 2px 5px",
+            width: "100%",
+        }
+    ],
+    footer: [
+        theme.fonts.medium,
+        {
+            height: "10%",
+            width: "100%",
+            marginLeft: "5px"
+        }
     ]
 });
 
 export default class Events extends React.Component<IEventsProps, IEventState>{
     private _menuButtonElement = React.createRef<HTMLDivElement>();
-    private itemID: string = this.props.eventUrl + '&ItemId=' + this.props.ID;
     /**
      *
      */
@@ -139,13 +155,14 @@ export default class Events extends React.Component<IEventsProps, IEventState>{
     }
 
     public render(): React.ReactElement<IEventsProps> {
-        const { EndDate, EventDate, monthArray, Category, Title, Location, Description } = this.props;     
+        const { EndDate, EventDate, monthArray, Category, Title, Location, Description } = this.props; var regex = new RegExp(/(<([^>]+)>)/ig);
+        let desc: string = Description.replace(regex, "");
 
         const tempStartDate = new Date(EventDate);
-        
+
         const tempEndDate = new Date(EndDate);//Wed, 05 Dec 2018 00:00:00 GMT
         let dateIsDiff: boolean = false;
-        if (new Date(Date.UTC(tempStartDate.getFullYear(), tempStartDate.getMonth(), tempStartDate.getDate(), 0, 0, 0, 0)).toUTCString() !== new Date(Date.UTC(tempEndDate.getFullYear(), tempEndDate.getMonth(), tempEndDate.getDate(), 0, 0, 0, 0)).toUTCString()) {
+        if (new Date(Date.UTC(tempStartDate.getUTCFullYear(), tempStartDate.getUTCMonth(), tempStartDate.getUTCDate(), 0, 0, 0, 0)).toString() !== new Date(Date.UTC(tempEndDate.getUTCFullYear(), tempEndDate.getUTCMonth(), tempEndDate.getUTCDate(), 0, 0, 0, 0)).toString()) {
             dateIsDiff = true;
         }
 
@@ -215,20 +232,25 @@ export default class Events extends React.Component<IEventsProps, IEventState>{
                             <div className={styles.eventTitle}>
                                 <div className={styles.eventInnerTitle}>{Title}</div>
                                 <div>
-                                    <ActionButton 
+                                    <ActionButton
                                         iconProps={{
-                                            iconName : 'AddEvent'
+                                            iconName: 'AddEvent'
                                         }}
                                     >
-                                    Add to Outlook
+                                        Add to Outlook
                                     </ActionButton>
                                 </div>
                             </div>
                         </div>
-                        <div>{Description}</div>
-                        <div>{Location}</div>
-                        <div>{startDay}, {this.props.monthArray[tempStartDate.getUTCMonth()]} {tempStartDate.getDate()} {this.props.fAllDayEvent ? "All Day" : `${tempStartDate.getHours()}:${tempStartDate.getMinutes()}`}</div>
-                        {/* <div><Link href={this.itemID}>Click for more details</Link></div> */}
+                        <div className={styles.body}>
+                            {desc}
+                        </div>
+                        <div className={styles.footer}>
+                            <div>{Location}</div>
+                            <div>{startDay}, {this.props.monthArray[tempStartDate.getUTCMonth()]} {tempStartDate.getDate()} {this.props.fAllDayEvent ? "All Day" : `${tempStartDate.getHours()}:${tempStartDate.getMinutes()}`}</div>
+                            <div><Link href={this.props.eventUrl} target="_blank">Click for more details</Link></div>
+                        </div>
+
                     </div>
                 </Callout>
             </div>

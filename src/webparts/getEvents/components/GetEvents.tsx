@@ -10,6 +10,7 @@ import { Spinner, SpinnerSize } from 'office-ui-fabric-react/lib/Spinner';
 import Pagination from './Pagination/Pagination';
 import { IChoiceGroupOption } from 'office-ui-fabric-react/lib/ChoiceGroup';
 import Filters from './Filters/Filter';
+import { IDropdownOption } from 'office-ui-fabric-react/lib/Dropdown';
 
 export interface IGetEventsState {
   calendarItems: IEventsListItems[];
@@ -38,27 +39,23 @@ export default class GetEvents extends React.Component<IGetEventsProps, IGetEven
   }
 
   public componentDidMount() {
-    this.getListItems().then(() => this.createPagination()).then(() => this.paginationOnChangeHandler(false, { key: "0" })).then(() => { this.setState({ showSpinner: false }); });
-  }
-
-  protected getListItems = async () => {
     const tempTodayDate = new Date();
-    //logic for today
     const todayDate = tempTodayDate.toISOString().substring(0, 10) + "T00:00:00Z";
     const tempWeekLastDayTemp = tempTodayDate.getDate() - tempTodayDate.getDay() + 6;
-    //logic for week day
     const weekLastDay = new Date(tempTodayDate.setDate(tempWeekLastDayTemp)).toISOString().substring(0, 10) + "T00:00:00Z";
-    //logic for last day
-    const monthLastDay = new Date(tempTodayDate.getFullYear(), tempTodayDate.getMonth() + 1, 0, 23, 59, 59).toISOString().substring(0, 10) + "T00:00:00Z";
+    const queryFilter: string = `EventDate ge dateTime'${todayDate}' and EventDate le dateTime'${weekLastDay}'`;
 
-    // const calendar = await pnp.sp.web.lists.getById(this.props.listGUID).items.filter(`EventDate ge dateTime'${todayDate}' and EventDate le dateTime'${monthLastDay}'`).configure({
-    //   headers: {
-    //     'Accept': 'application/json;odata=nometadata',
-    //     'odata-version': ''
-    //   }
-    // }).get().then(el => el);
+    this.getListItems(queryFilter).then(() => this.createPagination()).then(() => this.paginationOnChangeHandler(false, { key: "0" })).then(() => { this.setState({ showSpinner: false }); });
+  }
 
-    const calendar = await pnp.sp.web.lists.getById(this.props.listGUID).items.filter(``).top(30).configure({
+  protected getListItems = async (filterQuery: string) => {
+
+    this.setState({
+      showSpinner: true
+    });
+
+
+    const calendar = await pnp.sp.web.lists.getById(this.props.listGUID).items.filter(`${filterQuery}`).top(30).configure({
       headers: {
         'Accept': 'application/json;odata=nometadata',
         'odata-version': ''
@@ -130,6 +127,26 @@ export default class GetEvents extends React.Component<IGetEventsProps, IGetEven
     });
   }
 
+  protected filterDropDownChangeHandler = (item: IDropdownOption) => {
+    const tempTodayDate = new Date();
+    //logic for today
+    const todayDate = tempTodayDate.toISOString().substring(0, 10) + "T00:00:00Z";
+    const tempWeekLastDayTemp = tempTodayDate.getDate() - tempTodayDate.getDay() + 6;
+    let queryFilter: string = '';
+
+
+    if (item.key === 'A') {
+      const weekLastDay = new Date(tempTodayDate.setDate(tempWeekLastDayTemp)).toISOString().substring(0, 10) + "T00:00:00Z";
+      queryFilter = `EventDate ge dateTime'${todayDate}' and EventDate le dateTime'${weekLastDay}'`;
+    }
+    else {
+      const monthLastDay = new Date(tempTodayDate.getFullYear(), tempTodayDate.getMonth() + 1, 0, 23, 59, 59).toISOString().substring(0, 10) + "T00:00:00Z";
+      queryFilter = `EventDate ge dateTime'${todayDate}' and EventDate le dateTime'${monthLastDay}'`;
+    }
+
+    this.getListItems(queryFilter).then(() => this.createPagination()).then(() => this.paginationOnChangeHandler(false, { key: "0" })).then(() => { this.setState({ showSpinner: false }); });
+
+  }
 
 
   public render(): React.ReactElement<IGetEventsProps> {
@@ -149,7 +166,7 @@ export default class GetEvents extends React.Component<IGetEventsProps, IGetEven
               monthArray={this.monthArray}
               key={id}
               ID={el.ID}
-              eventUrl={"#"}
+              eventUrl={`${this.props.currentUrl}/_layouts/15/Event.aspx?ListGuid=${this.props.listGUID}&ItemId=${el.ID}`}
               Description={el.Description}
             />
           )
@@ -166,14 +183,18 @@ export default class GetEvents extends React.Component<IGetEventsProps, IGetEven
         />
       </div> : null;
 
-    const filters: JSX.Element = showEvents ?
-      <Filters /> : null;
 
     return (
       <div className={styles.getEvents}>
-        {showSpinner}
-        {filters}
-        {showEvents}
+        <Filters
+          onFilterDropDownChange={this.filterDropDownChangeHandler.bind(this)}
+        />
+        {
+          showEvents ? showEvents : this.state.showSpinner ? showSpinner :
+            <div className={styles.noItemsAvailable}>
+              <div className={styles.messageNoItems}>No Events available</div>
+            </div>
+        }
         {pagination}
         {/* <Link href={"#"}>See all</Link> */}
       </div>
