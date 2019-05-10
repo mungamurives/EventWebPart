@@ -156,7 +156,7 @@ export default class Events extends React.Component<IEventsProps, IEventState>{
 
     public render(): React.ReactElement<IEventsProps> {
         const { EndDate, EventDate, monthArray, Category, Title, Location, Description } = this.props; var regex = new RegExp(/(<([^>]+)>)/ig);
-        let desc: string = Description.replace(regex, "");
+        let desc: string = Description ? Description.replace(regex, "") : null;
 
         const tempStartDate = new Date(EventDate);
 

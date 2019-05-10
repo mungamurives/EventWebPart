@@ -109,7 +109,8 @@ export default class GetEvents extends React.Component<IGetEventsProps, IGetEven
   }
 
   private paginationOnChangeHandler = (ev: any, option: any): void => {
-    let tempPaginationSelected: number = parseInt(option.key, 0);
+    debugger;
+    let tempPaginationSelected: number = parseInt(option.key, 10);
     const { pageSize } = this.state;
     const calendarData: IEventsListItems[] = [...this.state.calendarItems];
     let calendarEventsToBeDisplayed: IEventsListItems[] = [];
@@ -128,6 +129,7 @@ export default class GetEvents extends React.Component<IGetEventsProps, IGetEven
   }
 
   protected filterDropDownChangeHandler = (item: IDropdownOption) => {
+    
     const tempTodayDate = new Date();
     //logic for today
     const todayDate = tempTodayDate.toISOString().substring(0, 10) + "T00:00:00Z";
